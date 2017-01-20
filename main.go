@@ -17,20 +17,21 @@ type response struct {
 	answers map[string]string
 }
 
-var apiKeyFlag = flag.String("apiKey", "", "TypeForm API key")
+var typeFormAPIKeyFlag = flag.String("typeformAPIKey", "", "TypeForm API key")
 var formUIDFlag = flag.String("formUID", "", "TypeForm form UID")
 var slackAPITokenFlag = flag.String("slackAPIToken", "", "SlackAPIToken")
 var intervalFlag = flag.Int("interval", 1, "Interval for checking TypeForm responses (in minutes)")
 
-func fetchTypeformData(apiKey string, formUID string, since time.Time) (payload, error) {
+// fetchTypeformData fetches the typeform responses since the given timestamp
+// and returns a `payload`
+func fetchTypeformData(typeFormAPIKey string, formUID string, since time.Time) (payload, error) {
 	sinceTimestamp := since.Unix()
-	endpoint := fmt.Sprintf("https://api.typeform.com/v1/form/%s?key=%s&since=%d", formUID, apiKey, sinceTimestamp)
+	endpoint := fmt.Sprintf("https://api.typeform.com/v1/form/%s?key=%s&since=%d", formUID, typeFormAPIKey, sinceTimestamp)
 	var ret payload
-	fmt.Println(endpoint)
 
 	res, err := http.Get(endpoint)
 	if err != nil {
-		fmt.Println("err", err)
+		return ret, err
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
@@ -48,6 +49,7 @@ func fetchTypeformData(apiKey string, formUID string, since time.Time) (payload,
 	return data, nil
 }
 
+// sendSlackInvitation sends Slack invitation to the given email address
 func sendSlackInvitation(email string) error {
 	fmt.Println("Inviting", email)
 	endpoint := fmt.Sprintf("https://slack.com/api/users.admin.invite?token=%s&email=%s&resend=false", *slackAPITokenFlag, email)
@@ -74,7 +76,7 @@ func run() {
 	now := time.Now().UTC()
 	targetTime := now.Add(-time.Duration(*intervalFlag) * time.Minute)
 
-	data, err := fetchTypeformData(*apiKeyFlag, *formUIDFlag, targetTime)
+	data, err := fetchTypeformData(*typeFormAPIKeyFlag, *formUIDFlag, targetTime)
 	if err != nil {
 		panic(err)
 	}

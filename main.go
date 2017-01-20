@@ -10,11 +10,11 @@ import (
 )
 
 type payload struct {
-	responses []response
+	Responses []response `json:"responses"`
 }
 
 type response struct {
-	answers map[string]string
+	Answers map[string]string `json:"answers"`
 }
 
 var typeFormAPIKeyFlag = flag.String("typeformAPIKey", "", "TypeForm API key")
@@ -27,6 +27,7 @@ var intervalFlag = flag.Int("interval", 1, "Interval for checking TypeForm respo
 func fetchTypeformData(typeFormAPIKey string, formUID string, since time.Time) (payload, error) {
 	sinceTimestamp := since.Unix()
 	endpoint := fmt.Sprintf("https://api.typeform.com/v1/form/%s?key=%s&since=%d", formUID, typeFormAPIKey, sinceTimestamp)
+	fmt.Println(endpoint)
 	var ret payload
 
 	res, err := http.Get(endpoint)
@@ -81,10 +82,10 @@ func run() {
 		panic(err)
 	}
 
-	fmt.Println("Need to invite", len(data.responses))
+	fmt.Println("Need to invite", len(data.Responses))
 
-	for _, response := range data.responses {
-		email := response.answers["email_40622900"]
+	for _, response := range data.Responses {
+		email := response.Answers["email_40622900"]
 		if email != "" {
 			sendSlackInvitation(email)
 			fmt.Println("Inviting", email)

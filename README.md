@@ -7,6 +7,9 @@ Automatically send Slack invitations for new responses in TypeForm.
 TypeForm Slack Inviter checks TypeForm responses periodically and sends Slack
 invites to emails in new responses.
 
+Used in production at [RemoteMesh](https://www.remotemesh.com/), a chat community
+for remote work.
+
 ## Installation
 
     go get github.com/sungwoncho/typeform-slack-inviter

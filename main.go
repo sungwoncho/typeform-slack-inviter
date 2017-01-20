@@ -88,7 +88,6 @@ func run() {
 		email := response.Answers["email_40622900"]
 		if email != "" {
 			sendSlackInvitation(email)
-			fmt.Println("Inviting", email)
 		}
 	}
 }

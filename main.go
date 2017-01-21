@@ -86,6 +86,11 @@ func run() {
 
 	for _, response := range data.Responses {
 		email := response.Answers["email_40622900"]
+
+		if email == "" {
+			email = response.Answers["email_41266127"]
+		}
+
 		if email != "" {
 			sendSlackInvitation(email)
 		}
